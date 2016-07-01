@@ -12,6 +12,8 @@
  */
 package org.apache.kafka.common.metrics;
 
+import org.apache.kafka.common.Metric;
+
 import java.util.List;
 import java.util.Map;
 
@@ -21,13 +23,13 @@ public class FakeMetricsReporter implements MetricsReporter {
     public void configure(Map<String, ?> configs) {}
 
     @Override
-    public void init(List<KafkaMetric> metrics) {}
+    public void init(List<? extends Metric> metrics) {}
 
     @Override
-    public void metricChange(KafkaMetric metric) {}
+    public void metricChange(Metric metric) {}
 
     @Override
-    public void metricRemoval(KafkaMetric metric) {}
+    public void metricRemoval(Metric metric) {}
 
     @Override
     public void close() {}

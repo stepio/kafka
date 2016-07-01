@@ -32,6 +32,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,9 +62,9 @@ public class JmxReporter implements MetricsReporter {
     public void configure(Map<String, ?> configs) {}
 
     @Override
-    public void init(List<KafkaMetric> metrics) {
+    public void init(List<? extends Metric> metrics) {
         synchronized (LOCK) {
-            for (KafkaMetric metric : metrics)
+            for (Metric metric : metrics)
                 addAttribute(metric);
             for (KafkaMbean mbean : mbeans.values())
                 reregister(mbean);
@@ -71,7 +72,7 @@ public class JmxReporter implements MetricsReporter {
     }
 
     @Override
-    public void metricChange(KafkaMetric metric) {
+    public void metricChange(Metric metric) {
         synchronized (LOCK) {
             KafkaMbean mbean = addAttribute(metric);
             reregister(mbean);
@@ -79,7 +80,7 @@ public class JmxReporter implements MetricsReporter {
     }
 
     @Override
-    public void metricRemoval(KafkaMetric metric) {
+    public void metricRemoval(Metric metric) {
         synchronized (LOCK) {
             KafkaMbean mbean = removeAttribute(metric);
             if (mbean != null) {
@@ -91,7 +92,7 @@ public class JmxReporter implements MetricsReporter {
         }
     }
 
-    private KafkaMbean removeAttribute(KafkaMetric metric) {
+    private KafkaMbean removeAttribute(Metric metric) {
         MetricName metricName = metric.metricName();
         String mBeanName = getMBeanName(metricName);
         KafkaMbean mbean = this.mbeans.get(mBeanName);
@@ -100,7 +101,7 @@ public class JmxReporter implements MetricsReporter {
         return mbean;
     }
 
-    private KafkaMbean addAttribute(KafkaMetric metric) {
+    private KafkaMbean addAttribute(Metric metric) {
         try {
             MetricName metricName = metric.metricName();
             String mBeanName = getMBeanName(metricName);
@@ -162,10 +163,10 @@ public class JmxReporter implements MetricsReporter {
 
     private static class KafkaMbean implements DynamicMBean {
         private final ObjectName objectName;
-        private final Map<String, KafkaMetric> metrics;
+        private final Map<String, Metric> metrics;
 
         public KafkaMbean(String mbeanName) throws MalformedObjectNameException {
-            this.metrics = new HashMap<String, KafkaMetric>();
+            this.metrics = new HashMap<String, Metric>();
             this.objectName = new ObjectName(mbeanName);
         }
 
@@ -173,7 +174,7 @@ public class JmxReporter implements MetricsReporter {
             return objectName;
         }
 
-        public void setAttribute(String name, KafkaMetric metric) {
+        public void setAttribute(String name, Metric metric) {
             this.metrics.put(name, metric);
         }
 
@@ -198,7 +199,7 @@ public class JmxReporter implements MetricsReporter {
             }
         }
 
-        public KafkaMetric removeAttribute(String name) {
+        public Metric removeAttribute(String name) {
             return this.metrics.remove(name);
         }
 
@@ -206,9 +207,9 @@ public class JmxReporter implements MetricsReporter {
         public MBeanInfo getMBeanInfo() {
             MBeanAttributeInfo[] attrs = new MBeanAttributeInfo[metrics.size()];
             int i = 0;
-            for (Map.Entry<String, KafkaMetric> entry : this.metrics.entrySet()) {
+            for (Map.Entry<String, Metric> entry : this.metrics.entrySet()) {
                 String attribute = entry.getKey();
-                KafkaMetric metric = entry.getValue();
+                Metric metric = entry.getValue();
                 attrs[i] = new MBeanAttributeInfo(attribute,
                                                   double.class.getName(),
                                                   metric.metricName().description(),

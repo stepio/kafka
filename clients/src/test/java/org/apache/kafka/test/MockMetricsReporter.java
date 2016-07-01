@@ -16,7 +16,7 @@
  */
 package org.apache.kafka.test;
 
-import org.apache.kafka.common.metrics.KafkaMetric;
+import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.metrics.MetricsReporter;
 
 import java.util.List;
@@ -32,15 +32,15 @@ public class MockMetricsReporter implements MetricsReporter {
     }
 
     @Override
-    public void init(List<KafkaMetric> metrics) {
+    public void init(List<? extends Metric> metrics) {
         INIT_COUNT.incrementAndGet();
     }
 
     @Override
-    public void metricChange(KafkaMetric metric) {}
+    public void metricChange(Metric metric) {}
 
     @Override
-    public void metricRemoval(KafkaMetric metric) {}
+    public void metricRemoval(Metric metric) {}
 
     @Override
     public void close() {

@@ -15,6 +15,7 @@ package org.apache.kafka.common.metrics;
 import java.util.List;
 
 import org.apache.kafka.common.Configurable;
+import org.apache.kafka.common.Metric;
 
 /**
  * A plugin interface to allow things to listen as new metrics are created so they can be reported.
@@ -25,19 +26,19 @@ public interface MetricsReporter extends Configurable {
      * This is called when the reporter is first registered to initially register all existing metrics
      * @param metrics All currently existing metrics
      */
-    public void init(List<KafkaMetric> metrics);
+    public void init(List<? extends Metric> metrics);
 
     /**
      * This is called whenever a metric is updated or added
      * @param metric
      */
-    public void metricChange(KafkaMetric metric);
+    public void metricChange(Metric metric);
 
     /**
      * This is called whenever a metric is removed
      * @param metric
      */
-    public void metricRemoval(KafkaMetric metric);
+    public void metricRemoval(Metric metric);
 
     /**
      * Called when the metrics repository is closed.
