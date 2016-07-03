@@ -15,7 +15,6 @@ package org.apache.kafka.common.config;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.config.ConfigDef.Importance;
 import org.apache.kafka.common.config.ConfigDef.Type;
-import org.apache.kafka.common.metrics.FakeMetricsReporter;
 import org.apache.kafka.common.metrics.MetricsReporter;
 import org.junit.Test;
 
@@ -113,16 +112,6 @@ public class AbstractConfigTest {
 
         public TestConfig(Map<?, ?> props) {
             super(CONFIG, props);
-        }
-    }
-
-    public static class ConfiguredFakeMetricsReporter extends FakeMetricsReporter {
-        @Override
-        public void configure(Map<String, ?> configs) {
-            FakeMetricsReporterConfig config = new FakeMetricsReporterConfig(configs);
-
-            // Calling getString() should have the side effect of marking that config as used.
-            config.getString(FakeMetricsReporterConfig.EXTRA_CONFIG);
         }
     }
 
