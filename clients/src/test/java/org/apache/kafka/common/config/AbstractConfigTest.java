@@ -16,6 +16,7 @@ import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.config.ConfigDef.Importance;
 import org.apache.kafka.common.config.ConfigDef.Type;
 import org.apache.kafka.common.metrics.MetricsReporter;
+import org.apache.kafka.test.MockMetricsReporter;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -32,8 +33,8 @@ public class AbstractConfigTest {
     @Test
     public void testConfiguredInstances() {
         testValidInputs("");
-        testValidInputs("org.apache.kafka.common.metrics.FakeMetricsReporter");
-        testValidInputs("org.apache.kafka.common.metrics.FakeMetricsReporter, org.apache.kafka.common.metrics.FakeMetricsReporter");
+        testValidInputs("org.apache.kafka.test.MockMetricsReporter");
+        testValidInputs("org.apache.kafka.test.MockMetricsReporter, org.apache.kafka.test.MockMetricsReporter");
         testInvalidInputs(",");
         testInvalidInputs("org.apache.kafka.clients.producer.unknown-metrics-reporter");
         testInvalidInputs("test1,test2");
@@ -60,7 +61,8 @@ public class AbstractConfigTest {
     @Test
     public void testUnused() {
         Properties props = new Properties();
-        String configValue = "org.apache.kafka.common.config.AbstractConfigTest$ConfiguredFakeMetricsReporter";
+        String configValue = ConfiguredMockMetricsReporter.class.getName();
+        assertEquals("org.apache.kafka.common.config.AbstractConfigTest$ConfiguredMockMetricsReporter", configValue);
         props.put(TestConfig.METRIC_REPORTER_CLASSES_CONFIG, configValue);
         props.put(FakeMetricsReporterConfig.EXTRA_CONFIG, "my_value");
         TestConfig config = new TestConfig(props);
@@ -112,6 +114,16 @@ public class AbstractConfigTest {
 
         public TestConfig(Map<?, ?> props) {
             super(CONFIG, props);
+        }
+    }
+
+    public static class ConfiguredMockMetricsReporter extends MockMetricsReporter {
+        @Override
+        public void configure(Map<String, ?> configs) {
+            FakeMetricsReporterConfig config = new FakeMetricsReporterConfig(configs);
+
+            // Calling getString() should have the side effect of marking that config as used.
+            config.getString(FakeMetricsReporterConfig.EXTRA_CONFIG);
         }
     }
 
