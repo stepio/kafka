@@ -590,6 +590,7 @@ project(':clients') {
     compile libs.snappy
     compile libs.slf4jApi
 
+    testCompile libs.assertj
     testCompile libs.bcpkix
     testCompile libs.junit
     testCompile libs.easymock

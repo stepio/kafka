@@ -27,6 +27,7 @@
   <allow pkg="javax.management" />
   <allow pkg="org.slf4j" />
   <allow pkg="org.junit" />
+  <allow pkg="org.assertj" />
   <allow pkg="org.hamcrest" />
   <allow pkg="org.easymock" />
   <allow pkg="org.powermock" />
